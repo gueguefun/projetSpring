@@ -1,11 +1,11 @@
-package com.magasin.demo
+package Projet.Article
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ProjetFinalApplication
+class ArticleApplication
 
 fun main(args: Array<String>) {
-	runApplication<ProjetFinalApplication>(*args)
+	runApplication<ArticleApplication>(*args)
 }

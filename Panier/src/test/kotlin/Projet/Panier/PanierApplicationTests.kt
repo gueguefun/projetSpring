@@ -1,10 +1,10 @@
-package com.magasin.demo
+package Projet.Panier
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class ProjetFinalApplicationTests {
+class PanierApplicationTests {
 
 	@Test
 	fun contextLoads() {
