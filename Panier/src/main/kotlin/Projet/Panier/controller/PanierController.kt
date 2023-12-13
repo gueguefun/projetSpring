@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
+
 
 @RestController
 @RequestMapping("/panier")
@@ -66,9 +63,9 @@ class PanierController(private val panierRepository : PanierRepository) {
             ApiResponse(responseCode = "404", description = "No panier found", content = [Content()])
         ]
     )
-    @GetMapping("/{userMail}")
-    fun get(@PathVariable userMail: String): ResponseEntity<Panier> {
-        val panier = panierRepository.get(userMail)
+    @GetMapping("/{id}")
+    fun get(@PathVariable id: String): ResponseEntity<Panier> {
+        val panier = panierRepository.get(id)
         return if (panier == null) {
             ResponseEntity.notFound().build()
         } else {
@@ -84,8 +81,19 @@ class PanierController(private val panierRepository : PanierRepository) {
             ApiResponse(responseCode = "400", description = "Panier already validated", content = [Content()])
         ]
     )
-    @PutMapping("/validate/{userMail}")
-
+    @PutMapping("/validate/{id}")
+    fun validate(@PathVariable id: String): ResponseEntity<Panier> {
+        return if (panierRepository.validate(id)) {
+            val panier = panierRepository.get(id)
+            if (panier == null) {
+                ResponseEntity.notFound().build()
+            } else {
+                ResponseEntity.ok(panier)
+            }
+        } else {
+            ResponseEntity.badRequest().build()
+        }
+    }
 
 
 }

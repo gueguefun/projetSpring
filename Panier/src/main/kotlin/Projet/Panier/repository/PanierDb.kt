@@ -6,6 +6,10 @@ import Projet.Panier.repository.entity.asEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import kotlin.jvm.optionals.getOrNull
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 @Repository
 class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
@@ -39,6 +43,25 @@ class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
             .also { jpa.deleteById(id) }
             .map { it.asPanier() }
             .getOrNull()
+    }
+
+    override fun validate(id: String): Boolean {
+        val url = "http://localhost:8081/articles/"
+        var validate = true
+        for (item in jpa.findById(id).get().items) {
+            val connectUrl = url + item.articleId
+            val connection = URL(connectUrl).openConnection() as HttpURLConnection
+
+            connection.requestMethod = "GET"
+
+            try {
+                
+            } catch (e : Exception) {
+                validate = false
+            }
+
+        }
+        return validate
     }
 }
 
