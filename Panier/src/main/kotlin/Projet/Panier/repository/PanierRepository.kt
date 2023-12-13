@@ -8,6 +8,5 @@ interface PanierRepository {
     fun get(id: String): Panier?
     fun update(panier: Panier): Result<Panier>
     fun delete(id: String): Panier?
-
-
+    fun validate(id: String): Boolean
 }

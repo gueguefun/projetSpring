@@ -143,4 +143,33 @@ class ArticleController(private val articleRepository : ArticleRepository) {
         }
     }
 
+    @Operation(summary="Check if quantity is available", description="", tags=["articles"])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Quantity available",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = Article::class)
+                )]
+            ),
+            ApiResponse(responseCode = "400", description = "Invalid input"),
+            ApiResponse(responseCode = "404", description = "Article not found"),
+            ApiResponse(responseCode = "409", description = "Quantity not available")
+        ]
+    )
+    @GetMapping("/quantity/{id}/{quantity}")
+    fun checkQuantity(@PathVariable id: Int, @PathVariable quantity: Int): ResponseEntity<Article> {
+        val article = articleRepository.get(id)
+        return if (article != null) {
+            if (article.quantity >= quantity) {
+                ResponseEntity(article, HttpStatus.OK)
+            } else {
+                ResponseEntity(HttpStatus.CONFLICT)
+            }
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
 }
