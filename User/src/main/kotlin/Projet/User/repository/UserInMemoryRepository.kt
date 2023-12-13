@@ -35,4 +35,14 @@ class UserInMemoryRepository : UserRepository {
     }
 
     override fun delete(email: String) = map.remove(email)
+
+    override fun switchSubscription(email: String): User? {
+        var userToUpdate = get(email)
+        if (userToUpdate != null) {
+            val newUser = User(userToUpdate.email,userToUpdate.name,userToUpdate.livraisonAdresse,!userToUpdate.isSub,userToUpdate.lastBuy)
+            update(newUser)
+            return newUser
+        }
+        return null
+    }
 }

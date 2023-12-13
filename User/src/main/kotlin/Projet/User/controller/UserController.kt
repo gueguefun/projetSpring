@@ -118,4 +118,21 @@ class UserController(val userRepository: UserRepository) {
             ResponseEntity.noContent().build()
         }
     }
+
+    @Operation(summary = "Subscribe or Unsubscribe a user", tags=["admin"])
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "User subscription updated"),
+        ApiResponse(responseCode = "400", description = "User not found",
+                content = [Content(mediaType = "application/json", schema = Schema(implementation = String::class))])
+    ])
+    @PutMapping("/admin/switchSubscritpion/{email}")
+    fun switchSubscription(@PathVariable @Email email: String): ResponseEntity<Any> {
+        val userUpdated = userRepository.switchSubscription(email)
+        return if (userUpdated == null) {
+            ResponseEntity.badRequest().body("User not found")
+        } else {
+            logger.info("Request to switch subscription : $userUpdated")
+            ResponseEntity.ok(userUpdated)
+        }
+    }
 }
