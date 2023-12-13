@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Min
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 @RequestMapping("/users")
 class UserController(val userRepository: UserRepository) {
+    private val logger: Logger = LoggerFactory.getLogger(UserController::class.java)
 
     @Operation(summary = "Create user", tags=["admin"])
     @ApiResponses(value = [
@@ -37,6 +40,7 @@ class UserController(val userRepository: UserRepository) {
     fun create(@RequestBody @Valid user: UserDTO): ResponseEntity<UserDTO> {
         val result = userRepository.create(user.asUser())
         return if (result.isSuccess) {
+            logger.info("Request to create a User : $user")
             ResponseEntity(user, HttpStatus.CREATED)
         } else {
             ResponseEntity(HttpStatus.CONFLICT)
@@ -70,6 +74,7 @@ class UserController(val userRepository: UserRepository) {
     fun findOne(@PathVariable @Email email: String): ResponseEntity<UserDTO> {
         val user = userRepository.get(email)
         return if (user != null) {
+            logger.info("Request to find a user by his email : $email\n$user")
             ResponseEntity.ok(user.asUserDTO())
         } else {
             throw UserNotFoundError(email)
@@ -90,6 +95,7 @@ class UserController(val userRepository: UserRepository) {
         } else {
             val result = userRepository.update(user.asUser())
             return if (result.isSuccess) {
+                logger.info("Request to update a user : $user")
                 ResponseEntity.ok(user)
             } else {
                 ResponseEntity.badRequest().body("User not updated")
