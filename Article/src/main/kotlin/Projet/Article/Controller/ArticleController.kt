@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 @RequestMapping("/articles")
 class ArticleController(private val articleRepository : ArticleRepository) {
+
+    private val logger: Logger = LoggerFactory.getLogger(ArticleController::class.java)
 
     @Operation(summary = "Create a new article", description = "", tags = ["admin"])
     @ApiResponses(
@@ -40,6 +44,7 @@ class ArticleController(private val articleRepository : ArticleRepository) {
     fun createArticle(@RequestBody @Valid article: Article): ResponseEntity<Article> {
         val result = articleRepository.create(article)
         return if (result.isSuccess) {
+            logger.info("Request to create Article : $article")
             ResponseEntity(article, HttpStatus.CREATED)
         } else {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -84,6 +89,7 @@ class ArticleController(private val articleRepository : ArticleRepository) {
     fun getArticle(@PathVariable id: Int): ResponseEntity<Article> {
         val article = articleRepository.get(id)
         return if (article != null) {
+            logger.info("Request to get an Article by ID : $id\n$article")
             ResponseEntity(article, HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -112,6 +118,7 @@ class ArticleController(private val articleRepository : ArticleRepository) {
         }
         val result = articleRepository.update(updatedArticle)
         return if (result.isSuccess) {
+            logger.info("Request to update an Article : $result")
             ResponseEntity(updatedArticle, HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -137,6 +144,7 @@ class ArticleController(private val articleRepository : ArticleRepository) {
     fun deleteArticle(@PathVariable id: Int): ResponseEntity<Article> {
         val deletedArticle = articleRepository.delete(id)
         return if (deletedArticle != null) {
+            logger.info("Request to delete an Article by ID : $deletedArticle")
             ResponseEntity(deletedArticle, HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -164,6 +172,7 @@ class ArticleController(private val articleRepository : ArticleRepository) {
         val article = articleRepository.get(id)
         return if (article != null) {
             if (article.quantity >= quantity) {
+                logger.info("Check quantity of an Article")
                 ResponseEntity(article, HttpStatus.OK)
             } else {
                 ResponseEntity(HttpStatus.CONFLICT)
