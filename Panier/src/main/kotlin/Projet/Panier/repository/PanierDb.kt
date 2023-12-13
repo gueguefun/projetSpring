@@ -13,12 +13,12 @@ import java.net.URL
 
 @Repository
 class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
-    override fun create(panier: Panier): Result<Panier> {
-        if (jpa.findById(panier.userEmail).isPresent ) {
+    override fun create(id : String): Result<Panier> {
+        if (jpa.findById(id).isPresent ) {
             return Result.failure(Exception("Panier already in DB"))
         } else {
             val url = "http://localhost:8080/users/"
-            val connectUrl = url + panier.userEmail
+            val connectUrl = url + id
             val connection = URL(connectUrl).openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
 
@@ -30,7 +30,8 @@ class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
                     if (response == 404) throw Exception("User not found")
                     Result.failure(Exception("User not found"))
                 } else {
-                    val saved = jpa.save(panier.asEntity())
+                    val panier = PanierEntity(id, mutableListOf())
+                    val saved = jpa.save(panier)
                     Result.success(saved.asPanier())
                 }
             } finally {
@@ -64,7 +65,7 @@ class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
     }
 
     override fun validate(id: String): Boolean {
-        val url = "http://localhost:8081/articles/quantity/"
+        var url = "http://localhost:8081/articles/quantity/"
         var validate = true
         for (item in jpa.findById(id).get().items) {
             val quantity = item.quantite.toString()
@@ -88,7 +89,28 @@ class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
             }
         }
         if (validate) {
-            //update la quantité sur la base de donnée article
+            val url = "http://localhost:8081/articles/quantity/"
+            for (item in jpa.findById(id).get().items) {
+                val quantity = item.quantite.toString()
+                val connectUrl = url + item.articleId + "/" + quantity
+                val connection = URL(connectUrl).openConnection() as HttpURLConnection
+
+                connection.requestMethod = "PUT"
+
+                try {
+                    //Récuparation de la réponse
+                    val response = connection.responseCode
+
+                    if (response != 200) {
+                        validate = false
+                        if (response == 404) throw Exception("Article not found")
+                        if (response == 409) throw Exception("Quantity not available")
+                    }
+
+                } finally {
+                    connection.disconnect()
+                }
+            }
         }
         return validate
     }

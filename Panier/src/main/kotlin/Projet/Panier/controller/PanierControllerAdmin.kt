@@ -39,9 +39,9 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
             ApiResponse(responseCode = "409", description = "Panier already exists", content = [Content()])
         ]
     )
-    @PostMapping
-    fun create(@Valid @RequestBody panier: Panier): ResponseEntity<Panier> {
-        val result = panierRepository.create(panier)
+    @PostMapping("/{id}")
+    fun create(@PathVariable id : String): ResponseEntity<Panier> {
+        val result = panierRepository.create(id)
         return if (result.isSuccess) {
             ResponseEntity(result.getOrNull(), HttpStatus.CREATED)
         } else {
@@ -64,8 +64,37 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
         ]
     )
     @PutMapping("/{id}/add/{articleId}/{quantity}")
-    fun addArticle(){
+    fun addArticle(@PathVariable id: String, @PathVariable articleId: Int, @PathVariable quantity: Int): ResponseEntity<Panier> {
+        val result = panierRepository.addArticle(id, articleId, quantity)
+        return if (result.isSuccess) {
+            ResponseEntity(result.getOrNull(), HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
 
+    @Operation(summary = "Delete an article from a panier", description = "", tags = ["admin"])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Panier updated", content = [
+                    Content(
+                        mediaType = "application/json", schema = Schema(implementation = Panier::class)
+                    )
+                ]
+            ),
+            ApiResponse(responseCode = "400", description = "Invalid input", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "Panier not found", content = [Content()])
+        ]
+    )
+    @PutMapping("/{id}/delete/{articleId}")
+    fun deleteArticle(@PathVariable id: String, @PathVariable articleId: Int): ResponseEntity<Panier> {
+        val result = panierRepository.deleteArticle(id, articleId)
+        return if (result.isSuccess) {
+            ResponseEntity(result.getOrNull(), HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
     }
 
 
