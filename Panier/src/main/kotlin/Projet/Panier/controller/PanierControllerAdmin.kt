@@ -19,6 +19,8 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @RestController
 @RequestMapping("/panier/admin")
@@ -41,7 +43,8 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
     )
     @PostMapping("/{id}")
     fun create(@PathVariable id : String): ResponseEntity<Panier> {
-        val result = panierRepository.create(id)
+        val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
+        val result = panierRepository.create(decodedId)
         return if (result.isSuccess) {
             ResponseEntity(result.getOrNull(), HttpStatus.CREATED)
         } else {
@@ -65,7 +68,8 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
     )
     @PutMapping("/{id}/add/{articleId}/{quantity}")
     fun addArticle(@PathVariable id: String, @PathVariable articleId: Int, @PathVariable quantity: Int): ResponseEntity<Panier> {
-        val result = panierRepository.addArticle(id, articleId, quantity)
+        val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
+        val result = panierRepository.addArticle(decodedId, articleId, quantity)
         return if (result.isSuccess) {
             ResponseEntity(result.getOrNull(), HttpStatus.OK)
         } else {
@@ -89,7 +93,8 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
     )
     @PutMapping("/{id}/delete/{articleId}")
     fun deleteArticle(@PathVariable id: String, @PathVariable articleId: Int): ResponseEntity<Panier> {
-        val result = panierRepository.deleteArticle(id, articleId)
+        val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
+        val result = panierRepository.deleteArticle(decodedId, articleId)
         return if (result.isSuccess) {
             ResponseEntity(result.getOrNull(), HttpStatus.OK)
         } else {

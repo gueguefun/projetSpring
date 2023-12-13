@@ -75,6 +75,7 @@ class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
             connection.requestMethod = "GET"
 
             try {
+                println("entre")
                 //Récuparation de la réponse
                 val response = connection.responseCode
 
@@ -89,7 +90,7 @@ class PanierDb(private val jpa: PanierJpaRepository) : PanierRepository {
             }
         }
         if (validate) {
-            val url = "http://localhost:8081/articles/quantity/"
+            val url = "http://localhost:8081/articles/admin/quantity/"
             for (item in jpa.findById(id).get().items) {
                 val quantity = item.quantite.toString()
                 val connectUrl = url + item.articleId + "/" + quantity

@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 
 @RestController
@@ -83,8 +85,9 @@ class PanierController(private val panierRepository : PanierRepository) {
     )
     @PutMapping("/validate/{id}")
     fun validate(@PathVariable id: String): ResponseEntity<Panier> {
-        return if (panierRepository.validate(id)) {
-            val panier = panierRepository.get(id)
+        val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
+        return if (panierRepository.validate(decodedId)) {
+            val panier = panierRepository.get(decodedId)
             if (panier == null) {
                 ResponseEntity.notFound().build()
             } else {

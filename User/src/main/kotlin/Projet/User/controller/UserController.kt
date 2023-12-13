@@ -29,7 +29,7 @@ class UserController(val userRepository: UserRepository) {
 
     @Operation(summary = "Create user", tags=["admin"])
     @ApiResponses(value = [
-        ApiResponse(responseCode = "201", description = "User created",
+        ApiResponse(responseCode = "200", description = "User created",
                 content = [Content(mediaType = "application/json",
                         schema = Schema(implementation = UserDTO::class)
                 )]),
@@ -49,7 +49,7 @@ class UserController(val userRepository: UserRepository) {
 
     @Operation(summary = "List users", tags=["user"])
     @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "List users",
+        ApiResponse(responseCode = "201", description = "List users",
                 content = [Content(mediaType = "application/json",
                         array = ArraySchema(
                                 schema = Schema(implementation = UserDTO::class))
@@ -71,13 +71,13 @@ class UserController(val userRepository: UserRepository) {
         ApiResponse(responseCode = "404", description = "User requested doesn't exist")
     ])
     @GetMapping("/{email}")
-    fun findOne(@PathVariable @Email email: String): ResponseEntity<UserDTO> {
+    fun findOne(@PathVariable @Email email: String): ResponseEntity<UserDTO?> {
         val user = userRepository.get(email)
         return if (user != null) {
             logger.info("Request to find a user by his email : $email\n$user")
             ResponseEntity.ok(user.asUserDTO())
         } else {
-            throw UserNotFoundError(email)
+            ResponseEntity(null, HttpStatus.BAD_REQUEST)
         }
     }
 

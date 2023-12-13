@@ -13,6 +13,7 @@ class PanierEntity(
     @CollectionTable(name = "panier_items", joinColumns = [JoinColumn(name = "panier_id")])
     var items: MutableList<ArticleEntity> = mutableListOf(),
 ) {
+    constructor() : this("")
     fun asPanier(): Panier {
         return Panier(userEmail, items.map { it.toDomain() }.toMutableList())
     }
@@ -30,6 +31,7 @@ data class ArticleEntity(
     val articleId: Int,
     var quantite: Int
 ){
+    constructor() : this(0,0)
     fun toDomain():Projet.Panier.domain.Article {
         return Projet.Panier.domain.Article(
             articleId = this.articleId,
