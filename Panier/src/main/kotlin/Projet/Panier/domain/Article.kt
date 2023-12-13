@@ -1,3 +1,3 @@
 package Projet.Panier.domain
 
-data class Quantite(val articleId: Int, var quantite: Int)
+data class Article(val articleId: Int, var quantite: Int)

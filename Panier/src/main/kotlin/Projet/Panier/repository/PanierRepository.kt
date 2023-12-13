@@ -9,4 +9,6 @@ interface PanierRepository {
     fun update(panier: Panier): Result<Panier>
     fun delete(id: String): Panier?
     fun validate(id: String): Boolean
+    fun addArticle(id: String, articleId: Int, quantite: Int): Result<Panier>
+    fun deleteArticle(id: String, articleId: Int): Result<Panier>
 }

@@ -8,4 +8,5 @@ interface ArticleRepository {
     fun get(id : Int): Article?
     fun update(article: Article): Result<Article>
     fun delete(id : Int): Article?
+    fun delQuantity(id : Int, quantity : Int): Result<Article>
 }

@@ -35,4 +35,15 @@ class ArticleBD : ArticleRepository {
     }
 
     override fun delete(id : Int) = map.remove(id.toString())
+
+    override fun delQuantity(id: Int, quantity: Int): Result<Article> {
+        val article = map[id.toString()]
+        return if (article == null) {
+            Result.failure(Exception("Article doesn't exit"))
+        } else {
+            val updated = article.copy(quantity = article.quantity - quantity)
+            map.replace(id.toString(), updated)
+            Result.success(updated)
+        }
+    }
 }

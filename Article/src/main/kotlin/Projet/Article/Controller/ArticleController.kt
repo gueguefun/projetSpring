@@ -181,4 +181,30 @@ class ArticleController(private val articleRepository : ArticleRepository) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+
+    @Operation(summary="Delete quantity of an article", description="", tags=["admin"])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Quantity updated",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = Article::class)
+                )]
+            ),
+            ApiResponse(responseCode = "400", description = "Invalid input"),
+            ApiResponse(responseCode = "404", description = "Article not found")
+        ]
+    )
+    @PutMapping("/admin/quantity/{id}/{quantity}")
+    fun delQuantity(@PathVariable id: Int, @PathVariable quantity: Int): ResponseEntity<Article> {
+        val result = articleRepository.delQuantity(id, quantity)
+        return if (result.isSuccess) {
+            logger.info("Request to update quantity of an Article : $result")
+            ResponseEntity(HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
 }

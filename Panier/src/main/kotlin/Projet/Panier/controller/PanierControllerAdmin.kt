@@ -20,6 +20,53 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+@RestController
+@RequestMapping("/panier/admin")
+@Validated
+class PanierControllerAdmin(private val panierRepository: PanierRepository) {
 
-class PanierControllerAdmin {
+    @Operation(summary = "Create a panier", description = "Pour une bonne utilisation de l'api, il faut créer un panier avec 0 article dedans, puis les ajouter 1 par 1", tags = ["admin"])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "201", description = "Panier created", content = [
+                    Content(
+                        mediaType = "application/json", schema = Schema(implementation = Panier::class)
+                    )
+                ]
+            ),
+            ApiResponse(responseCode = "400", description = "Invalid input", content = [Content()]),
+            ApiResponse(responseCode = "409", description = "Panier already exists", content = [Content()])
+        ]
+    )
+    @PostMapping
+    fun create(@Valid @RequestBody panier: Panier): ResponseEntity<Panier> {
+        val result = panierRepository.create(panier)
+        return if (result.isSuccess) {
+            ResponseEntity(result.getOrNull(), HttpStatus.CREATED)
+        } else {
+            ResponseEntity(HttpStatus.CONFLICT)
+        }
+    }
+
+    @Operation(summary = "Add an article to a panier", description = "", tags = ["admin"])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200", description = "Panier updated", content = [
+                    Content(
+                        mediaType = "application/json", schema = Schema(implementation = Panier::class)
+                    )
+                ]
+            ),
+            ApiResponse(responseCode = "400", description = "Invalid input", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "Panier not found", content = [Content()])
+        ]
+    )
+    @PutMapping("/{id}/add/{articleId}/{quantity}")
+    fun addArticle(){
+
+    }
+
+
 }
