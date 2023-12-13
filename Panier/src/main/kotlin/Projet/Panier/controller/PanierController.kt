@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -24,8 +26,7 @@ import java.nio.charset.StandardCharsets
 @Validated
 class PanierController(private val panierRepository : PanierRepository) {
 
-    val urlArticle = "http://localhost:8081/articles/"
-    val urlUser = "http://localhost:8080/users/"
+    private val logger: Logger = LoggerFactory.getLogger(PanierController::class.java)
 
     @Operation(summary = "Get all paniers", description = "", tags = ["Panier"])
     @ApiResponses(
@@ -46,8 +47,10 @@ class PanierController(private val panierRepository : PanierRepository) {
     fun list(): ResponseEntity<List<Panier>> {
         val paniers = panierRepository.list()
         return if (paniers.isEmpty()) {
+            logger.info("No panier found")
             ResponseEntity.notFound().build()
         } else {
+            logger.info("Paniers found")
             ResponseEntity.ok(paniers)
         }
     }
@@ -67,10 +70,13 @@ class PanierController(private val panierRepository : PanierRepository) {
     )
     @GetMapping("/{id}")
     fun get(@PathVariable id: String): ResponseEntity<Panier> {
-        val panier = panierRepository.get(id)
+        val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
+        val panier = panierRepository.get(decodedId)
         return if (panier == null) {
+            logger.info("No panier found")
             ResponseEntity.notFound().build()
         } else {
+            logger.info("Panier found")
             ResponseEntity.ok(panier)
         }
     }
@@ -89,11 +95,14 @@ class PanierController(private val panierRepository : PanierRepository) {
         return if (panierRepository.validate(decodedId)) {
             val panier = panierRepository.get(decodedId)
             if (panier == null) {
+                logger.info("No panier found")
                 ResponseEntity.notFound().build()
             } else {
+                logger.info("Panier validated")
                 ResponseEntity.ok(panier)
             }
         } else {
+            logger.info("Cest bizarre")
             ResponseEntity.badRequest().build()
         }
     }

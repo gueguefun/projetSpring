@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -26,6 +28,8 @@ import java.nio.charset.StandardCharsets
 @RequestMapping("/panier/admin")
 @Validated
 class PanierControllerAdmin(private val panierRepository: PanierRepository) {
+
+    private val logger : Logger = LoggerFactory.getLogger(PanierControllerAdmin::class.java)
 
     @Operation(summary = "Create a panier", description = "Pour une bonne utilisation de l'api, il faut créer un panier avec 0 article dedans, puis les ajouter 1 par 1", tags = ["admin"])
     @ApiResponses(
@@ -46,8 +50,10 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
         val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
         val result = panierRepository.create(decodedId)
         return if (result.isSuccess) {
+            logger.info("Panier created")
             ResponseEntity(result.getOrNull(), HttpStatus.CREATED)
         } else {
+            logger.info("Panier already exists")
             ResponseEntity(HttpStatus.CONFLICT)
         }
     }
@@ -71,8 +77,10 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
         val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
         val result = panierRepository.addArticle(decodedId, articleId, quantity)
         return if (result.isSuccess) {
+            logger.info("Article added to panier")
             ResponseEntity(result.getOrNull(), HttpStatus.OK)
         } else {
+            logger.info("Panier not found")
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
@@ -96,8 +104,10 @@ class PanierControllerAdmin(private val panierRepository: PanierRepository) {
         val decodedId = URLDecoder.decode(id, StandardCharsets.UTF_8)
         val result = panierRepository.deleteArticle(decodedId, articleId)
         return if (result.isSuccess) {
+            logger.info("Article deleted from panier")
             ResponseEntity(result.getOrNull(), HttpStatus.OK)
         } else {
+            logger.info("Panier not found")
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
