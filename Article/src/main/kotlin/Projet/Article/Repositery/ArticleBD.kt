@@ -4,7 +4,7 @@ import Projet.Article.Domain.Article
 import org.springframework.stereotype.Repository
 
 @Repository
-class ArticleBD : ArticleReposeitery {
+class ArticleBD : ArticleRepository {
 
     private val map = mutableMapOf<String, Article>()
 
@@ -28,7 +28,7 @@ class ArticleBD : ArticleReposeitery {
     override fun update(article: Article): Result<Article> {
         val updated = map.replace(article.id.toString(), article)
         return if (updated == null) {
-            Result.failure(Exception("User doesn't exit"))
+            Result.failure(Exception("Article doesn't exit"))
         } else {
             Result.success(article)
         }

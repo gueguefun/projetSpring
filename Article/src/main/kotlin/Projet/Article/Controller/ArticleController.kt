@@ -1,7 +1,7 @@
 package Projet.Article.Controller
 
 import Projet.Article.Domain.Article
-import Projet.Article.Repositery.ArticleReposeitery
+import Projet.Article.Repositery.ArticleRepository
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Validated
-@RequestMapping("/api/articles")
-class ArticleController(val articleRepository : ArticleReposeitery) {
+@RequestMapping("/articles")
+class ArticleController(private val articleRepository : ArticleRepository) {
 
-    @Operation(summary = "Create a new article", description = "", tags = ["articles"])
+    @Operation(summary = "Create a new article", description = "", tags = ["admin"])
     @ApiResponses(
         value = [
             ApiResponse(
@@ -36,7 +36,7 @@ class ArticleController(val articleRepository : ArticleReposeitery) {
             ApiResponse(responseCode = "409", description = "Article already exists")
         ]
     )
-    @PostMapping
+    @PostMapping("/admin")
     fun createArticle(@RequestBody @Valid article: Article): ResponseEntity<Article> {
         val result = articleRepository.create(article)
         return if (result.isSuccess) {
@@ -90,7 +90,7 @@ class ArticleController(val articleRepository : ArticleReposeitery) {
         }
     }
 
-    @Operation(summary = "Update an article", description = "", tags = ["articles"])
+    @Operation(summary = "Update an article", description = "", tags = ["admin"])
     @ApiResponses(
         value = [
             ApiResponse(
@@ -105,7 +105,7 @@ class ArticleController(val articleRepository : ArticleReposeitery) {
             ApiResponse(responseCode = "404", description = "Article not found")
         ]
     )
-    @PutMapping("/{id}")
+    @PutMapping("/admin/{id}")
     fun updateArticle(@PathVariable id: Int, @RequestBody updatedArticle: Article): ResponseEntity<Article> {
         if (updatedArticle.id != id) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -118,7 +118,7 @@ class ArticleController(val articleRepository : ArticleReposeitery) {
         }
     }
 
-    @Operation(summary = "Delete an article", description = "", tags = ["articles"])
+    @Operation(summary = "Delete an article", description = "", tags = ["admin"])
     @ApiResponses(
         value = [
             ApiResponse(
@@ -133,7 +133,7 @@ class ArticleController(val articleRepository : ArticleReposeitery) {
             ApiResponse(responseCode = "404", description = "Article not found")
         ]
     )
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     fun deleteArticle(@PathVariable id: Int): ResponseEntity<Article> {
         val deletedArticle = articleRepository.delete(id)
         return if (deletedArticle != null) {
